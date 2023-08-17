@@ -1,0 +1,27 @@
+{
+  "name": "simple-vue",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "^8.3.4",
+    "@types/node": "^20.5.0",
+    "eslint": "^8.33.0",
+    "prettier": "^2.7.1",
+    "rollup": "^3.20.2",
+    "rollup-plugin-dts": "^5.3.0",
+    "rollup-plugin-esbuild": "^5.0.0",
+    "rollup-plugin-polyfill-node": "^0.12.0",
+    "tslib": "^2.6.1",
+    "typescript": "^5.0.0"
+  }
+}
