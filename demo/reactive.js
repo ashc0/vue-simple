@@ -1,4 +1,4 @@
-import { effectMap, track } from './effect.mjs'
+import { trigger, track } from './effect.js'
 
 export const reactive = obj => {
   return new Proxy(obj, {
@@ -9,10 +9,8 @@ export const reactive = obj => {
 
     set(target, key, value, reciever) {
       Reflect.set(target, key, value, reciever)
-      effectMap
-        .get(target)
-        ?.get(key)
-        ?.forEach(i => typeof i === 'function' && i())
+      trigger(target, key)
+
       return true
     }
   })

@@ -1,5 +1,5 @@
-import { effect } from './effect.mjs'
-import { reactive } from './reactive.mjs'
+import { effect } from './effect.js'
+import { reactive } from './reactive.js'
 
 const obj = reactive({
   a: 1,
