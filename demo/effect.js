@@ -5,20 +5,28 @@ const effectStack = [] // 为了应对嵌套的effect，需要一个栈来存储
 export const bucket = new WeakMap()
 
 export const effect = (fn, options) => {
-  const effectFn = () => {
-    cleanup(effectFn)
-    activeEffect = effectFn
-    effectStack.push(effectFn) // 放入栈顶 确保如果在 fn 中如果有effect运行，那么等到effect运行完毕后，能够恢复到当前的effect
-    fn()
-    effectStack.pop() // 出栈 让栈的状态回归到之前的状态
-    activeEffect = effectStack[effectStack.length - 1] // 恢复到上一个状态
-    // activeEffect = null
+  const effect = createEffect(fn, options)
+  effect()
+}
+
+function createEffect(fn, options) {
+  const effect = function reactiveEffect() {
+    cleanup(effect)
+    try {
+      activeEffect = effect
+      effectStack.push(effect) // 放入栈顶 确保如果在 fn 中如果有effect运行，那么等到effect运行完毕后，能够恢复到当前的effect
+      fn()
+    } finally {
+      effectStack.pop() // 出栈 让栈的状态回归到之前的状态
+      activeEffect = effectStack[effectStack.length - 1] // 恢复到上一个状态
+    }
   }
 
-  // 将调度器挂载到 effectFn 上，这样在 trigger 时，用户就可以根据 effectFn.options 的调度器来调度
-  effectFn.options = options
-  effectFn.deps = []
-  effectFn()
+  // 将调度器挂载到 effect 上，这样在 trigger 时，用户就可以根据 effect.options 的调度器来调度
+  effect.options = options
+  effect.deps = []
+
+  return effect
 }
 
 export function cleanup(effectFn) {
@@ -65,7 +73,7 @@ export const trigger = (target, key) => {
   // 而之所以要再度依赖收集，是为了每次都能拿到最新的依赖关系
   effectsToRun.forEach(effectFn => {
     // 如果一个 effectFn 存在调度器，那么就调用调度器，并将 effectFn 传入
-    if (effectFn.options.scheduler) {
+    if (effectFn.options?.scheduler) {
       effectFn.options.scheduler(effectFn)
     } else {
       effectFn()

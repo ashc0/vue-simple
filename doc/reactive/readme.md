@@ -44,3 +44,7 @@ type DepsMap = WeakMap<target: object, Map<key: string, Set<function>>>
 思路：在使用effect注册副作用函数时，可以传入一个options，其中包含了scheduler调度器，并且挂载到effectFn上以供用户调用。在trigger时，也就是effectFn调用时，会先判断是否有调度器，有的话就用调度器调用effectFn，没有的话就直接调用effectFn。
 
 异步渲染的基本原理：利用调度器，调度执行时，将effectFn放入到一个set类型的jobQueue中，然后在下一个tick中执行这个jobQueue中的所有操作。
+
+## computed 计算属性
+
+背景：惰性执行，缓存计算结果。
