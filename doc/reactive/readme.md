@@ -36,3 +36,11 @@ type DepsMap = WeakMap<target: object, Map<key: string, Set<function>>>
 思路：判断引发trigger的是不是trigger本身的依赖源。在trigger中，遍历effectSet时，如果发现当前的effectFn就是activeEffect，那么就跳过这个effectFn。因为执行effectFn时，会将effectFn赋值给activeEffect，如果此时有activeEffect，就代表现在正在执行的trigger是由某一个effectFn触发的，那如果当前的activeEffect和trigger中会触发的effectFn是同一个，那就代表这个effectFn是由自己触发的，就跳过这个effectFn。
 
 实现：在创建effectSet的副本时，不会把完整的effectSet放进来，而是会判断哪些effectFn是activeEffect，如果是，就不放进去。这样就能避免effectFn触发自己。
+
+## scheduler 调度
+
+背景：能够控制副作用函数的执行时机 次数 方式。
+
+思路：在使用effect注册副作用函数时，可以传入一个options，其中包含了scheduler调度器，并且挂载到effectFn上以供用户调用。在trigger时，也就是effectFn调用时，会先判断是否有调度器，有的话就用调度器调用effectFn，没有的话就直接调用effectFn。
+
+异步渲染的基本原理：利用调度器，调度执行时，将effectFn放入到一个set类型的jobQueue中，然后在下一个tick中执行这个jobQueue中的所有操作。
