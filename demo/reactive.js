@@ -8,10 +8,10 @@ export const reactive = obj => {
     },
 
     set(target, key, value, reciever) {
-      Reflect.set(target, key, value, reciever)
+      const res = Reflect.set(target, key, value, reciever)
       trigger(target, key)
 
-      return true
+      return res
     }
   })
 }
