@@ -47,4 +47,10 @@ type DepsMap = WeakMap<target: object, Map<key: string, Set<function>>>
 
 ## computed 计算属性
 
-背景：惰性执行，缓存计算结果。
+背景：既是响应式数据，又是副作用函数。惰性执行（个人认为，既然computed作为计算属性，应该和值一样，不访问就相当于不存在），缓存计算结果。
+
+实现：
+1. 要有响应式数据的特征，就要有track和trigger的两个过程。在get value的时候触发track，在set value的时候触发trigger，也就是effect的scheduler中trigger。
+2. 要有副作用函数的特征，就要有effect(getter)的过程。但是在这里，这个effect(getter)的作用只是 1. 告诉computed数据是否脏了 2. 触发computed的依赖更新。
+3. 惰性执行，effect.options中添加lazy属性，为true时，不执行effectFn，返回effectFn。effectFn的调用完全由computed内部调度。
+   1. effectFn的调度：在computed的value的getter中，判断是否脏了，如果脏了，就执行effectFn，然后将脏标记清除，更新缓存。如果没有脏，就不执行effectFn，直接返回上一次的结果。

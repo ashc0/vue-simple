@@ -6,7 +6,12 @@ export const bucket = new WeakMap()
 
 export const effect = (fn, options) => {
   const effect = createEffect(fn, options)
-  effect()
+
+  if (!options?.lazy) {
+    effect()
+  }
+
+  return effect
 }
 
 function createEffect(fn, options) {
@@ -15,7 +20,7 @@ function createEffect(fn, options) {
     try {
       activeEffect = effect
       effectStack.push(effect) // 放入栈顶 确保如果在 fn 中如果有effect运行，那么等到effect运行完毕后，能够恢复到当前的effect
-      fn()
+      return fn()
     } finally {
       effectStack.pop() // 出栈 让栈的状态回归到之前的状态
       activeEffect = effectStack[effectStack.length - 1] // 恢复到上一个状态
@@ -81,4 +86,29 @@ export const trigger = (target, key) => {
   })
 }
 
-// activeEffect = fn
+export function computed(getter) {
+  let _value
+  let dirty = true
+  const effectFn = effect(getter, {
+    lazy: true,
+    scheduler() {
+      if (dirty === false) {
+        dirty = true
+        trigger(obj, 'value')
+      }
+    }
+  })
+
+  const obj = {
+    get value() {
+      if (dirty) {
+        _value = effectFn()
+        dirty = false
+      }
+      track(obj, 'value')
+      return _value
+    }
+  }
+
+  return obj
+}
