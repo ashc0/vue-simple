@@ -2,3 +2,4 @@
 2. 依赖收集的标志就是是否存在 activeEffect
 3. 响应式，说白了就是数据劫持+观察者模式。劫持 get 的时候依赖收集，劫持 set 的时候触发依赖。
 4. 关于cleanup，这个是针对effect的。也就是effect函数触发时会自动cleanup，和响应式数据无关。
+5. lazy可以让effectFn完全由用户自主调度。scheduler决定在effect被trigger时该如何调度。
