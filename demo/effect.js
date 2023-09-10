@@ -85,30 +85,3 @@ export const trigger = (target, key) => {
     }
   })
 }
-
-export function computed(getter) {
-  let _value
-  let dirty = true
-  const effectFn = effect(getter, {
-    lazy: true,
-    scheduler() {
-      if (dirty === false) {
-        dirty = true
-        trigger(obj, 'value')
-      }
-    }
-  })
-
-  const obj = {
-    get value() {
-      if (dirty) {
-        _value = effectFn()
-        dirty = false
-      }
-      track(obj, 'value')
-      return _value
-    }
-  }
-
-  return obj
-}

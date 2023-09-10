@@ -54,3 +54,13 @@ type DepsMap = WeakMap<target: object, Map<key: string, Set<function>>>
 2. 要有副作用函数的特征，就要有effect(getter)的过程。但是在这里，这个effect(getter)的作用只是 1. 告诉computed数据是否脏了 2. 触发computed的依赖更新。
 3. 惰性执行，effect.options中添加lazy属性，为true时，不执行effectFn，返回effectFn。effectFn的调用完全由computed内部调度。
    1. effectFn的调度：在computed的value的getter中，判断是否脏了，如果脏了，就执行effectFn，然后将脏标记清除，更新缓存。如果没有脏，就不执行effectFn，直接返回上一次的结果。
+
+## watch 侦听器
+
+背景：可以接收一个值，也可以接收一个getter。如果接收的是reactive对象，应该监听到这个对象下所有的深层属性的变化。如果接收的是getter，应该监听到getter中所有的响应式数据的变化。
+
+实现：
+1. 利用 effect + scheduler 来实现。effect收集依赖，scheduler调度执行 callback。
+2. 包装source，如果source是一个getter，那就 `() => getter()`。如果是响应式对象，那就 `() => traverse(source)`，traverse会深层遍历响应式对象的所有属性，确保能够监听到所有的属性变化，同时设置一个Set，应对循环引用的情况。
+   1. 所以直接监听响应式对象可能会有性能问题
+3. newValue oldValue。使用 lazy 来手动调度，这样就可以在调度时，获取到新旧值。初始化watch时，手动调用effectFn，来收集getter的依赖，并且得到oldValue。之后再scheduler中，每次触发，都会调用effectFn，来获取newValue，然后执行`callback(newValue, oldValue)`，然后将newValue赋值给oldValue。

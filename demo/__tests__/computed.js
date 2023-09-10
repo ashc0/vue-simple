@@ -1,4 +1,5 @@
-import { effect, computed } from "../effect.js";
+import { computed } from "../computed.js";
+import { effect } from "../effect.js";
 import { reactive } from "../reactive.js";
 
 const obj = reactive({ foo: 1, bar: 2 })
