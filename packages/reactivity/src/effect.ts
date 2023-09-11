@@ -1,5 +1,6 @@
 type EffectFnOptions = {
   scheduler?: (fn: EffectFn) => void
+  lazy?: boolean
 }
 
 type EffectFn = (() => void) & { deps: Effects[]; options: EffectFnOptions }
@@ -23,7 +24,7 @@ export function effect(
     try {
       activeEffect = effectFn
       effectStack.push(effectFn)
-      fn()
+      return fn()
     } finally {
       effectStack.pop()
       activeEffect = effectStack[effectStack.length - 1]
@@ -31,7 +32,10 @@ export function effect(
   }
   effectFn.deps = []
   effectFn.options = options
-  effectFn()
+
+  if (!effectFn.options.lazy) {
+    effectFn()
+  }
 
   return effectFn
 }

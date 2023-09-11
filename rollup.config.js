@@ -21,5 +21,24 @@ export default [
       nodeResolve(),
       commonjs()
     ]
+  },
+  {
+    input: 'packages/reactivity/src/index.ts',
+    output: [
+      {
+        sourcemap: true,
+        file: './packages/reactivity/dist/reactivity.esm-bundler.js',
+        format: 'es',
+        name: 'VueReactivity'
+      }
+    ],
+    plugins: [
+      typescript({
+        sourceMap: true,
+        tsconfig: './tsconfig.json'
+      }),
+      nodeResolve(),
+      commonjs()
+    ]
   }
 ]
