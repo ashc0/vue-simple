@@ -3,7 +3,7 @@ type EffectFnOptions = {
   lazy?: boolean
 }
 
-type EffectFn = (() => void) & { deps: Effects[]; options: EffectFnOptions }
+type EffectFn = (() => any) & { deps: Effects[]; options: EffectFnOptions }
 
 let activeEffect: EffectFn | undefined = undefined
 
